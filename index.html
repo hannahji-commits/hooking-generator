@@ -74,7 +74,7 @@
     font-family: inherit;
     font-size: 14px;
     color: #0F172A;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     background: #FFFFFF;
   }
   .field input:focus,
@@ -122,6 +122,7 @@
     font-size: 13px;
     color: #0F172A;
     background: #FFFFFF;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
   .benefit-input-row input:focus {
     outline: none;
@@ -172,6 +173,15 @@
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
+  }
+
+  /* 미리보기 하이라이트 효과 */
+  .preview-highlight {
+    outline: 3px solid #22C55E !important;
+    outline-offset: 4px;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4) !important;
+    border-radius: 8px;
+    transition: outline 0.3s, box-shadow 0.3s;
   }
 
   /* 카드 미리보기 (실제 카드 스타일) */
@@ -375,34 +385,34 @@
 
     <div class="field">
       <label>뱃지 문구</label>
-      <input type="text" id="badgeText" value="4월 한정 특별 혜택" oninput="updatePreview()">
+      <input type="text" id="badgeText" value="4월 한정 특별 혜택" data-preview="badge" oninput="updatePreview()" onfocus="highlightPreview('badge')" onblur="clearHighlight()">
       <div class="hint">예: "4월 한정 특별 혜택", "신규 회원 전용", "기간 한정 50% 할인"</div>
     </div>
 
     <div class="field">
       <label>제목 첫 줄</label>
-      <input type="text" id="titleLine1" value="중간고사 끝," oninput="updatePreview()">
+      <input type="text" id="titleLine1" value="중간고사 끝," data-preview="title" oninput="updatePreview()" onfocus="highlightPreview('title')" onblur="clearHighlight()">
     </div>
 
     <div class="field">
       <label>제목 둘째 줄 (강조 부분)</label>
-      <input type="text" id="titleHighlight" value="다음 시험" oninput="updatePreview()">
+      <input type="text" id="titleHighlight" value="다음 시험" data-preview="title" oninput="updatePreview()" onfocus="highlightPreview('title')" onblur="clearHighlight()">
       <div class="hint">오렌지색으로 강조되는 부분</div>
     </div>
 
     <div class="field">
       <label>제목 둘째 줄 (나머지)</label>
-      <input type="text" id="titleRest" value="이 진짜 승부입니다" oninput="updatePreview()">
+      <input type="text" id="titleRest" value="이 진짜 승부입니다" data-preview="title" oninput="updatePreview()" onfocus="highlightPreview('title')" onblur="clearHighlight()">
     </div>
 
     <div class="field">
       <label>부제목</label>
-      <input type="text" id="subtitleText" value="지금 시작하면 기말고사까지 완벽 준비" oninput="updatePreview()">
+      <input type="text" id="subtitleText" value="지금 시작하면 기말고사까지 완벽 준비" data-preview="subtitle" oninput="updatePreview()" onfocus="highlightPreview('subtitle')" onblur="clearHighlight()">
     </div>
 
     <div class="field">
       <label>본문 설명</label>
-      <textarea id="descText" rows="3" oninput="updatePreview()">1:1 맞춤 과외로 부족한 단원만 집중 보완하세요.
+      <textarea id="descText" rows="3" data-preview="desc" oninput="updatePreview()" onfocus="highlightPreview('desc')" onblur="clearHighlight()">1:1 맞춤 과외로 부족한 단원만 집중 보완하세요.
 명문대 선생님이 학생별 취약점을 정확히 짚어드립니다.</textarea>
     </div>
 
@@ -413,19 +423,19 @@
       <label>혜택 리스트 (최대 4개)</label>
       <div class="benefit-input-row">
         <span class="num">1</span>
-        <input type="text" id="benefit1" value="첫 수업 불만족 시 100% 환불" oninput="updatePreview()">
+        <input type="text" id="benefit1" value="첫 수업 불만족 시 100% 환불" data-preview="benefits" oninput="updatePreview()" onfocus="highlightPreview('benefits')" onblur="clearHighlight()">
       </div>
       <div class="benefit-input-row">
         <span class="num">2</span>
-        <input type="text" id="benefit2" value="1개월부터 부담 없이 수강 가능" oninput="updatePreview()">
+        <input type="text" id="benefit2" value="1개월부터 부담 없이 수강 가능" data-preview="benefits" oninput="updatePreview()" onfocus="highlightPreview('benefits')" onblur="clearHighlight()">
       </div>
       <div class="benefit-input-row">
         <span class="num">3</span>
-        <input type="text" id="benefit3" value="콴다 프리미엄 무료 제공" oninput="updatePreview()">
+        <input type="text" id="benefit3" value="콴다 프리미엄 무료 제공" data-preview="benefits" oninput="updatePreview()" onfocus="highlightPreview('benefits')" onblur="clearHighlight()">
       </div>
       <div class="benefit-input-row">
         <span class="num">4</span>
-        <input type="text" id="benefit4" value="" placeholder="(선택) 네 번째 혜택" oninput="updatePreview()">
+        <input type="text" id="benefit4" value="" placeholder="(선택) 네 번째 혜택" data-preview="benefits" oninput="updatePreview()" onfocus="highlightPreview('benefits')" onblur="clearHighlight()">
       </div>
     </div>
 
@@ -433,17 +443,12 @@
 
     <div class="field">
       <label>CTA 버튼 문구</label>
-      <input type="text" id="ctaText" value="무료 상담 신청하기" oninput="updatePreview()">
+      <input type="text" id="ctaText" value="무료 상담 신청하기" data-preview="cta" oninput="updatePreview()" onfocus="highlightPreview('cta')" onblur="clearHighlight()">
     </div>
 
     <div class="field">
       <label>CTA 링크 URL</label>
-      <input type="text" id="ctaUrl" value="https://class.qanda.ai/" oninput="updatePreview()">
-    </div>
-
-    <div class="field">
-      <label>고객센터 번호</label>
-      <input type="text" id="footerText" value="콴다과외 고객센터 1533-4751" oninput="updatePreview()">
+      <input type="text" id="ctaUrl" value="https://class.qanda.ai/" data-preview="cta" oninput="updatePreview()" onfocus="highlightPreview('cta')" onblur="clearHighlight()">
     </div>
   </div>
 
@@ -458,7 +463,7 @@
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" onclick="copyHTML()">HTML 복사하기</button>
+      <button class="btn btn-primary" onclick="copyPublishLink()">게시용 링크 복사</button>
       <button class="btn btn-secondary" onclick="downloadHTML()">파일 다운로드</button>
     </div>
   </div>
@@ -468,6 +473,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // 고정 고객센터 번호
+  const FOOTER_TEXT = '콴다과외 고객센터 02-6956-9243';
+
   // 미리보기 업데이트 함수
   function updatePreview() {
     const badge = document.getElementById('badgeText').value;
@@ -482,7 +490,6 @@
     const benefit4 = document.getElementById('benefit4').value;
     const ctaText = document.getElementById('ctaText').value;
     const ctaUrl = document.getElementById('ctaUrl').value;
-    const footer = document.getElementById('footerText').value;
 
     // 혜택 리스트 생성 (빈 칸은 제외)
     const benefits = [benefit1, benefit2, benefit3, benefit4].filter(b => b.trim() !== '');
@@ -506,24 +513,41 @@
           <span class="logo-text">콴다과외</span>
         </div>
         <div class="card-body">
-          <div class="badge">
+          <div class="badge" data-section="badge">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
               <path d="M8 1.33L9.06 4.73L12.67 5.33L10.33 7.8L10.8 11.67L8 9.77L5.2 11.67L5.67 7.8L3.33 5.33L6.94 4.73L8 1.33Z" stroke="#F25C05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span>${escapeHTML(badge)}</span>
           </div>
-          <h1 class="card-title">
+          <h1 class="card-title" data-section="title">
             ${escapeHTML(line1)}<br>
             <span class="highlight">${escapeHTML(highlight)}</span>${escapeHTML(rest)}
           </h1>
-          <p class="card-subtitle">${escapeHTML(subtitle)}</p>
-          <p class="card-desc">${descHTML}</p>
-          <ul class="benefit-list">${benefitHTML}</ul>
-          <a href="${escapeHTML(ctaUrl)}" class="cta-button">${escapeHTML(ctaText)}</a>
+          <p class="card-subtitle" data-section="subtitle">${escapeHTML(subtitle)}</p>
+          <p class="card-desc" data-section="desc">${descHTML}</p>
+          <ul class="benefit-list" data-section="benefits">${benefitHTML}</ul>
+          <a href="${escapeHTML(ctaUrl)}" class="cta-button" data-section="cta">${escapeHTML(ctaText)}</a>
         </div>
-        <div class="card-footer">${escapeHTML(footer)}</div>
+        <div class="card-footer">${FOOTER_TEXT}</div>
       </div>
     `;
+  }
+
+  // 미리보기 하이라이트 — 편집 중인 필드에 대응하는 미리보기 영역에 초록 네온 박스 표시
+  function highlightPreview(section) {
+    clearHighlight();
+    const el = document.querySelector(`[data-section="${section}"]`);
+    if (el) {
+      el.classList.add('preview-highlight');
+      // 해당 영역이 보이도록 스크롤
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  function clearHighlight() {
+    document.querySelectorAll('.preview-highlight').forEach(el => {
+      el.classList.remove('preview-highlight');
+    });
   }
 
   // HTML 이스케이프
@@ -533,7 +557,7 @@
     return div.innerHTML;
   }
 
-  // 독립 실행 가능한 HTML 생성
+  // 독립 실행 가능한 HTML 생성 (게시용)
   function generateStandaloneHTML() {
     const badge = document.getElementById('badgeText').value;
     const line1 = document.getElementById('titleLine1').value;
@@ -547,7 +571,6 @@
     const benefit4 = document.getElementById('benefit4').value;
     const ctaText = document.getElementById('ctaText').value;
     const ctaUrl = document.getElementById('ctaUrl').value;
-    const footer = document.getElementById('footerText').value;
 
     const benefits = [benefit1, benefit2, benefit3, benefit4].filter(b => b.trim() !== '');
     const benefitItems = benefits.map(b => `
@@ -702,26 +725,46 @@
     <ul class="benefit-list">${benefitItems}</ul>
     <a href="${escapeHTML(ctaUrl)}" class="cta-button">${escapeHTML(ctaText)}</a>
   </div>
-  <div class="card-footer">${escapeHTML(footer)}</div>
+  <div class="card-footer">${FOOTER_TEXT}</div>
 </div>
 </body>
 </html>`;
   }
 
-  // HTML 클립보드 복사
-  function copyHTML() {
+  // 게시용 링크 복사 — data URI를 통해 CTA 버튼 클릭까지 살아있는 완전한 페이지 링크 생성
+  function copyPublishLink() {
     const html = generateStandaloneHTML();
-    navigator.clipboard.writeText(html).then(() => {
-      showToast('HTML 코드가 복사되었습니다!');
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+
+    // 파일명에 날짜 포함
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    const fileName = `hooking-card-${dateStr}.html`;
+
+    // 먼저 파일 다운로드 (GitHub Pages에 올릴 파일)
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // GitHub Pages 배포 경로를 클립보드에 복사
+    const repoBase = 'https://hannahji-commits.github.io/hooking-generator/';
+    const publishUrl = repoBase + fileName;
+
+    navigator.clipboard.writeText(publishUrl).then(() => {
+      showToast(`링크 복사 완료! 파일을 GitHub에 올리면 이 URL로 접속됩니다:\n${publishUrl}`);
     }).catch(() => {
-      // 폴백: textarea 이용
       const ta = document.createElement('textarea');
-      ta.value = html;
+      ta.value = publishUrl;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      showToast('HTML 코드가 복사되었습니다!');
+      showToast(`링크 복사 완료! 파일을 GitHub에 올리면 이 URL로 접속됩니다`);
     });
   }
 
@@ -732,7 +775,6 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
 
-    // 파일명에 날짜 포함
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
     a.href = url;
@@ -749,7 +791,7 @@
     const toast = document.getElementById('toast');
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
   // 페이지 로드 시 초기 미리보기 렌더링
