@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콴다과외 후킹 카드 생성기</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F1F5F9;
+    min-height: 100vh;
+    color: #0F172A;
+  }
+
+  /* 상단 헤더 */
+  .app-header {
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #FFFFFF;
+  }
+  .app-header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 400;
+  }
+
+  /* 메인 레이아웃 */
+  .main {
+    display: flex;
+    gap: 32px;
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 왼쪽: 입력 폼 */
+  .editor {
+    flex: 1;
+    min-width: 0;
+  }
+  .editor h2 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #334155;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #0F172A;
+    transition: border-color 0.2s;
+    background: #FFFFFF;
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: #F25C05;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  .field .hint {
+    font-size: 11px;
+    color: #94A3B8;
+    margin-top: 4px;
+  }
+
+  /* 혜택 입력 영역 */
+  .benefits-editor {
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .benefits-editor label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .benefit-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .benefit-input-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: #0F172A;
+    background: #FFFFFF;
+  }
+  .benefit-input-row input:focus {
+    outline: none;
+    border-color: #F25C05;
+  }
+  .benefit-input-row .num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #F25C05;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* 구분선 */
+  .section-divider {
+    height: 1px;
+    background: #E2E8F0;
+    margin: 24px 0;
+  }
+
+  /* 오른쪽: 미리보기 */
+  .preview-area {
+    width: 440px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 32px;
+    align-self: flex-start;
+  }
+  .preview-area h2 {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: #22C55E;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* 카드 미리보기 (실제 카드 스타일) */
+  .card {
+    background: #FFFFFF;
+    border: 2px solid #FFD6A8;
+    border-radius: 24px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+  }
+  .card-header {
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header .logo-text {
+    font-size: 16px;
+    font-weight: 900;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+  }
+  .card-body {
+    padding: 32px 28px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF4ED;
+    border: 2px solid #F25C05;
+    border-radius: 999px;
+    padding: 6px 16px;
+    margin-bottom: 20px;
+  }
+  .badge span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #F25C05;
+    letter-spacing: 0.02em;
+  }
+  .card-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0F172A;
+    line-height: 1.3;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .card-title .highlight {
+    color: #F25C05;
+  }
+  .card-subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #F25C05;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 15px;
+    font-weight: 400;
+    color: #334155;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .benefit-list {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+  .benefit-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.6;
+  }
+  .benefit-list li .check {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: #FFF4ED;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .benefit-list li .check svg {
+    width: 12px;
+    height: 12px;
+  }
+  .cta-button {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(242, 92, 5, 0.3);
+  }
+  .card-footer {
+    padding: 16px 28px;
+    background: #FFF4ED;
+    text-align: center;
+    font-size: 13px;
+    color: #94A3B8;
+    line-height: 1.5;
+  }
+
+  /* 액션 버튼들 */
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(242, 92, 5, 0.3);
+  }
+  .btn-secondary {
+    background: #FFFFFF;
+    color: #334155;
+    border: 2px solid #E2E8F0;
+  }
+
+  /* 복사 완료 토스트 */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #0F172A;
+    color: #FFFFFF;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* 반응형 */
+  @media (max-width: 900px) {
+    .main {
+      flex-direction: column;
+      padding: 20px;
+    }
+    .preview-area {
+      width: 100%;
+      position: static;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- 상단 헤더 -->
+<div class="app-header">
+  <div>
+    <h1>콴다과외 후킹 카드 생성기</h1>
+    <div class="subtitle">문구만 입력하면 브랜드 맞춤 카드가 자동 생성됩니다</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- 왼쪽: 입력 폼 -->
+  <div class="editor">
+    <h2>카드 내용 입력</h2>
+
+    <div class="field">
+      <label>뱃지 문구</label>
+      <input type="text" id="badgeText" value="4월 한정 특별 혜택" oninput="updatePreview()">
+      <div class="hint">예: "4월 한정 특별 혜택", "신규 회원 전용", "기간 한정 50% 할인"</div>
+    </div>
+
+    <div class="field">
+      <label>제목 첫 줄</label>
+      <input type="text" id="titleLine1" value="중간고사 끝," oninput="updatePreview()">
+    </div>
+
+    <div class="field">
+      <label>제목 둘째 줄 (강조 부분)</label>
+      <input type="text" id="titleHighlight" value="다음 시험" oninput="updatePreview()">
+      <div class="hint">오렌지색으로 강조되는 부분</div>
+    </div>
+
+    <div class="field">
+      <label>제목 둘째 줄 (나머지)</label>
+      <input type="text" id="titleRest" value="이 진짜 승부입니다" oninput="updatePreview()">
+    </div>
+
+    <div class="field">
+      <label>부제목</label>
+      <input type="text" id="subtitleText" value="지금 시작하면 기말고사까지 완벽 준비" oninput="updatePreview()">
+    </div>
+
+    <div class="field">
+      <label>본문 설명</label>
+      <textarea id="descText" rows="3" oninput="updatePreview()">1:1 맞춤 과외로 부족한 단원만 집중 보완하세요.
+명문대 선생님이 학생별 취약점을 정확히 짚어드립니다.</textarea>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- 혜택 리스트 -->
+    <div class="benefits-editor">
+      <label>혜택 리스트 (최대 4개)</label>
+      <div class="benefit-input-row">
+        <span class="num">1</span>
+        <input type="text" id="benefit1" value="첫 수업 불만족 시 100% 환불" oninput="updatePreview()">
+      </div>
+      <div class="benefit-input-row">
+        <span class="num">2</span>
+        <input type="text" id="benefit2" value="1개월부터 부담 없이 수강 가능" oninput="updatePreview()">
+      </div>
+      <div class="benefit-input-row">
+        <span class="num">3</span>
+        <input type="text" id="benefit3" value="콴다 프리미엄 무료 제공" oninput="updatePreview()">
+      </div>
+      <div class="benefit-input-row">
+        <span class="num">4</span>
+        <input type="text" id="benefit4" value="" placeholder="(선택) 네 번째 혜택" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="field">
+      <label>CTA 버튼 문구</label>
+      <input type="text" id="ctaText" value="무료 상담 신청하기" oninput="updatePreview()">
+    </div>
+
+    <div class="field">
+      <label>CTA 링크 URL</label>
+      <input type="text" id="ctaUrl" value="https://class.qanda.ai/" oninput="updatePreview()">
+    </div>
+
+    <div class="field">
+      <label>고객센터 번호</label>
+      <input type="text" id="footerText" value="콴다과외 고객센터 1533-4751" oninput="updatePreview()">
+    </div>
+  </div>
+
+  <!-- 오른쪽: 미리보기 -->
+  <div class="preview-area">
+    <h2>
+      <span><span class="live-dot"></span>실시간 미리보기</span>
+    </h2>
+
+    <div id="cardPreview">
+      <!-- 여기에 카드가 렌더링됨 -->
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="copyHTML()">HTML 복사하기</button>
+      <button class="btn btn-secondary" onclick="downloadHTML()">파일 다운로드</button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 메시지 -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // 미리보기 업데이트 함수
+  function updatePreview() {
+    const badge = document.getElementById('badgeText').value;
+    const line1 = document.getElementById('titleLine1').value;
+    const highlight = document.getElementById('titleHighlight').value;
+    const rest = document.getElementById('titleRest').value;
+    const subtitle = document.getElementById('subtitleText').value;
+    const desc = document.getElementById('descText').value;
+    const benefit1 = document.getElementById('benefit1').value;
+    const benefit2 = document.getElementById('benefit2').value;
+    const benefit3 = document.getElementById('benefit3').value;
+    const benefit4 = document.getElementById('benefit4').value;
+    const ctaText = document.getElementById('ctaText').value;
+    const ctaUrl = document.getElementById('ctaUrl').value;
+    const footer = document.getElementById('footerText').value;
+
+    // 혜택 리스트 생성 (빈 칸은 제외)
+    const benefits = [benefit1, benefit2, benefit3, benefit4].filter(b => b.trim() !== '');
+    const benefitHTML = benefits.map(b => `
+      <li>
+        <span class="check">
+          <svg viewBox="0 0 12 12" fill="none">
+            <path d="M2.5 6L5 8.5L9.5 3.5" stroke="#F25C05" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>${escapeHTML(b)}</span>
+      </li>
+    `).join('');
+
+    // 본문 줄바꿈 처리
+    const descHTML = escapeHTML(desc).replace(/\n/g, '<br>');
+
+    document.getElementById('cardPreview').innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <span class="logo-text">콴다과외</span>
+        </div>
+        <div class="card-body">
+          <div class="badge">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1.33L9.06 4.73L12.67 5.33L10.33 7.8L10.8 11.67L8 9.77L5.2 11.67L5.67 7.8L3.33 5.33L6.94 4.73L8 1.33Z" stroke="#F25C05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>${escapeHTML(badge)}</span>
+          </div>
+          <h1 class="card-title">
+            ${escapeHTML(line1)}<br>
+            <span class="highlight">${escapeHTML(highlight)}</span>${escapeHTML(rest)}
+          </h1>
+          <p class="card-subtitle">${escapeHTML(subtitle)}</p>
+          <p class="card-desc">${descHTML}</p>
+          <ul class="benefit-list">${benefitHTML}</ul>
+          <a href="${escapeHTML(ctaUrl)}" class="cta-button">${escapeHTML(ctaText)}</a>
+        </div>
+        <div class="card-footer">${escapeHTML(footer)}</div>
+      </div>
+    `;
+  }
+
+  // HTML 이스케이프
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // 독립 실행 가능한 HTML 생성
+  function generateStandaloneHTML() {
+    const badge = document.getElementById('badgeText').value;
+    const line1 = document.getElementById('titleLine1').value;
+    const highlight = document.getElementById('titleHighlight').value;
+    const rest = document.getElementById('titleRest').value;
+    const subtitle = document.getElementById('subtitleText').value;
+    const desc = document.getElementById('descText').value;
+    const benefit1 = document.getElementById('benefit1').value;
+    const benefit2 = document.getElementById('benefit2').value;
+    const benefit3 = document.getElementById('benefit3').value;
+    const benefit4 = document.getElementById('benefit4').value;
+    const ctaText = document.getElementById('ctaText').value;
+    const ctaUrl = document.getElementById('ctaUrl').value;
+    const footer = document.getElementById('footerText').value;
+
+    const benefits = [benefit1, benefit2, benefit3, benefit4].filter(b => b.trim() !== '');
+    const benefitItems = benefits.map(b => `
+      <li>
+        <span class="check">
+          <svg viewBox="0 0 12 12" fill="none">
+            <path d="M2.5 6L5 8.5L9.5 3.5" stroke="#F25C05" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>${escapeHTML(b)}</span>
+      </li>`).join('');
+
+    const descHTML = escapeHTML(desc).replace(/\n/g, '<br>');
+
+    return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콴다과외 안내</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F7F7F7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .card {
+    background: #FFFFFF;
+    border: 2px solid #FFD6A8;
+    border-radius: 24px;
+    max-width: 420px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+  }
+  .card-header {
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    padding: 16px 24px;
+  }
+  .card-header .logo-text {
+    font-size: 16px;
+    font-weight: 900;
+    color: #FFFFFF;
+  }
+  .card-body { padding: 32px 28px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF4ED;
+    border: 2px solid #F25C05;
+    border-radius: 999px;
+    padding: 6px 16px;
+    margin-bottom: 20px;
+  }
+  .badge span { font-size: 13px; font-weight: 700; color: #F25C05; }
+  .card-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0F172A;
+    line-height: 1.3;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .card-title .highlight { color: #F25C05; }
+  .card-subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #F25C05;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+  .benefit-list { list-style: none; margin-bottom: 28px; }
+  .benefit-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.6;
+  }
+  .benefit-list li .check {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: #FFF4ED;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .benefit-list li .check svg { width: 12px; height: 12px; }
+  .cta-button {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, #F25C05 0%, #FE9A00 100%);
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(242, 92, 5, 0.3);
+  }
+  .cta-button:hover {
+    filter: brightness(1.05);
+  }
+  .card-footer {
+    padding: 16px 28px;
+    background: #FFF4ED;
+    text-align: center;
+    font-size: 13px;
+    color: #94A3B8;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <span class="logo-text">콴다과외</span>
+  </div>
+  <div class="card-body">
+    <div class="badge">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.33L9.06 4.73L12.67 5.33L10.33 7.8L10.8 11.67L8 9.77L5.2 11.67L5.67 7.8L3.33 5.33L6.94 4.73L8 1.33Z" stroke="#F25C05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>${escapeHTML(badge)}</span>
+    </div>
+    <h1 class="card-title">
+      ${escapeHTML(line1)}<br>
+      <span class="highlight">${escapeHTML(highlight)}</span>${escapeHTML(rest)}
+    </h1>
+    <p class="card-subtitle">${escapeHTML(subtitle)}</p>
+    <p class="card-desc">${descHTML}</p>
+    <ul class="benefit-list">${benefitItems}</ul>
+    <a href="${escapeHTML(ctaUrl)}" class="cta-button">${escapeHTML(ctaText)}</a>
+  </div>
+  <div class="card-footer">${escapeHTML(footer)}</div>
+</div>
+</body>
+</html>`;
+  }
+
+  // HTML 클립보드 복사
+  function copyHTML() {
+    const html = generateStandaloneHTML();
+    navigator.clipboard.writeText(html).then(() => {
+      showToast('HTML 코드가 복사되었습니다!');
+    }).catch(() => {
+      // 폴백: textarea 이용
+      const ta = document.createElement('textarea');
+      ta.value = html;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('HTML 코드가 복사되었습니다!');
+    });
+  }
+
+  // HTML 파일 다운로드
+  function downloadHTML() {
+    const html = generateStandaloneHTML();
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    // 파일명에 날짜 포함
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    a.href = url;
+    a.download = `hooking-card-${dateStr}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('파일이 다운로드되었습니다!');
+  }
+
+  // 토스트 메시지
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // 페이지 로드 시 초기 미리보기 렌더링
+  updatePreview();
+</script>
+
+</body>
+</html>
